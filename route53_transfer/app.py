@@ -49,7 +49,8 @@ def get_aws_credentials(params):
             secret_key = f.read().strip()
     else:
         secret_key = params.get('--secret-key') or environ.get('AWS_SECRET_ACCESS_KEY')
-    return access_key, secret_key
+    security_token = environ.get('AWS_SESSION_TOKEN')
+    return access_key, secret_key, security_token
 
 
 def get_zone(con, zone_name, vpc):
@@ -227,9 +228,10 @@ def up_to_s3(con, file, s3_bucket):
 
 
 def run(params):
-    access_key, secret_key = get_aws_credentials(params)
-    con = route53.connect_to_region('universal', aws_access_key_id=access_key, aws_secret_access_key=secret_key)
-    con_s3 = connect_s3(aws_access_key_id=access_key, aws_secret_access_key=secret_key)
+    access_key, secret_key, security_token = get_aws_credentials(params)
+    print(access_key, secret_key, security_token)
+    con = route53.connect_to_region('universal', aws_access_key_id=access_key, aws_secret_access_key=secret_key, security_token=security_token)
+    con_s3 = connect_s3(aws_access_key_id=access_key, aws_secret_access_key=secret_key, security_token=security_token)
     zone_name = params['<zone>']
     filename = params['<file>']
 
